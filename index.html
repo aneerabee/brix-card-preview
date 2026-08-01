@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Quote Card V7.6</title>
+  <title>BRIX — Quote Card V7.7</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -337,10 +337,10 @@
     .factor,
     .priced-party,
     .period-axis,
-    .period-origin-rate,
+    .period-rate-old,
     .period-discount,
     .period-rate,
-    .period-rate-pp,
+    .period-pp,
     .night,
     .dock-segments strong,
     .dock-old-inline,
@@ -601,10 +601,9 @@
     }
 
     .rate-map {
-      --period-mobile-width: 10.5rem;
+      --period-mobile-width: 11.875rem;
       --period-mobile-head: 48px;
       --period-mobile-night: 24px;
-      --period-rate-column: 4.25rem;
       position: relative;
       padding: var(--space-sm) var(--space-lg) var(--space-md);
       border-top: 1px solid var(--line-soft);
@@ -736,7 +735,7 @@
     .rate-period[data-discount="true"]::before {
       content: "";
       position: absolute;
-      z-index: 2;
+      z-index: 0;
       inset: 0 auto 0 -28%;
       width: 18%;
       pointer-events: none;
@@ -753,49 +752,35 @@
     @keyframes saving-scan { to { transform: translateX(720%) skewX(-16deg); } }
 
     .period-head {
-      min-height: 46px;
+      position: relative;
+      z-index: 1;
+      min-height: var(--period-mobile-head);
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas:
-        "axis rate"
-        "terms terms";
-      align-items: flex-start;
-      gap: var(--space-xs) var(--space-sm);
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: 18px 18px;
+      align-items: center;
+      gap: var(--space-xs);
       padding: var(--space-xs) var(--space-sm);
       border-bottom: 1px solid color-mix(in oklch, var(--period) 25%, var(--line-soft));
     }
 
+    .period-primary,
+    .period-secondary {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
     .rate-period[data-single="true"] .period-head {
       min-height: 24px;
+      grid-template-rows: auto;
       align-items: center;
       padding-block: 5px 3px;
     }
 
-    .rate-period[data-single-discount="true"] .period-head {
-      min-height: 44px;
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas: "axis terms";
-      align-items: center;
-      gap: var(--space-lg);
-      padding: var(--space-sm);
-    }
-
-    .rate-period[data-single-discount="true"] .period-terms {
-      justify-self: stretch;
-      justify-content: center;
-      flex-wrap: nowrap;
-    }
-
-    .discount-equation {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      min-width: 0;
-      color: var(--period);
-      white-space: nowrap;
-    }
-
-    .period-origin-rate {
+    .period-rate-old {
       display: inline-flex;
       align-items: center;
       gap: 3px;
@@ -806,12 +791,12 @@
       white-space: nowrap;
     }
 
-    .period-origin-rate s {
+    .period-rate-old s {
       text-decoration-color: var(--red);
       text-decoration-thickness: 1.5px;
     }
 
-    .period-origin-rate i {
+    .period-rate-old i {
       color: var(--period);
       font-style: normal;
       font-weight: var(--weight-bold);
@@ -819,7 +804,7 @@
     }
 
     .period-axis {
-      grid-area: axis;
+      min-width: 0;
       min-height: 13px;
       display: flex;
       align-items: center;
@@ -847,16 +832,18 @@
     }
 
     .period-terms {
-      grid-area: terms;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       gap: var(--space-xs);
-      margin-top: 0;
+      min-width: 0;
       color: var(--muted);
       font-size: var(--text-2xs);
       line-height: 1.1;
+      white-space: nowrap;
     }
+
+    .period-terms[data-empty="true"],
+    .period-pp[data-empty="true"] { visibility: hidden; }
 
     .period-discount {
       display: inline-flex;
@@ -898,16 +885,18 @@
     }
 
     .period-rate {
-      grid-area: rate;
-      inline-size: var(--period-rate-column);
-      min-width: var(--period-rate-column);
+      min-width: 0;
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: var(--space-xs);
       color: var(--period);
       text-align: right;
       white-space: nowrap;
     }
 
     .period-rate strong {
-      display: block;
+      display: inline-block;
       font-size: 1rem;
       font-weight: var(--weight-extrabold);
       line-height: 1;
@@ -915,17 +904,19 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .period-rate-pp {
-      display: block;
-      margin-top: 3px;
+    .period-pp {
+      margin-inline-start: auto;
       color: var(--muted);
       font-size: var(--text-2xs);
       font-weight: var(--weight-semibold);
       line-height: 1;
       letter-spacing: -.01em;
+      white-space: nowrap;
     }
 
     .night-line {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: repeat(var(--span), minmax(25px, 1fr));
     }
@@ -1286,9 +1277,10 @@
     .dock-old-inline {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2xs);
+      gap: 3px;
       color: color-mix(in oklch, var(--paper) 68%, var(--pine-950));
-      font-size: var(--text-2xs);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
       line-height: 1;
       white-space: nowrap;
     }
@@ -1337,16 +1329,37 @@
 
     .dock-value {
       position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
-      gap: var(--space-xs);
       margin-top: var(--space-sm);
       padding-bottom: var(--space-xs);
       animation: price-rise 480ms var(--ease-out) 180ms both;
     }
 
-    .dock-price-stack { min-width: 0; }
+    .dock-price-stack {
+      min-width: 0;
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .dock-price-line,
+    .dock-price-meta {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .dock-price-line {
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .dock-price-meta { gap: var(--space-sm); }
+
+    .dock-range-inline {
+      color: var(--cream);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      white-space: nowrap;
+    }
 
     .dock-current {
       display: flex;
@@ -1653,17 +1666,16 @@
       .rate-unit-mark { inset-block-start: -7px; inset-inline-end: var(--space-sm); padding-inline: var(--space-xs); }
       .rate-unit-mark .rate-motion-mark { width: 15px; height: 10px; }
       .rate-period { flex-grow: 1; flex-basis: max(var(--period-mobile-width), calc(var(--span) * 28px)); min-width: max(var(--period-mobile-width), calc(var(--span) * 28px)); }
-      .result-card[data-period-count="2"] .rate-period { flex-basis: max(9rem, calc(var(--span) * 28px)); min-width: max(9rem, calc(var(--span) * 28px)); }
-      .period-head { min-height: var(--period-mobile-head); grid-template-rows: minmax(24px, auto) minmax(16px, auto); gap: var(--space-xs) var(--space-sm); padding: var(--space-xs) var(--space-sm); }
+      .result-card[data-period-count="2"] .rate-period { flex-basis: max(10.5rem, calc(var(--span) * 28px)); min-width: max(10.5rem, calc(var(--span) * 28px)); }
+      .period-head { min-height: var(--period-mobile-head); grid-template-rows: 18px 18px; gap: var(--space-xs); padding: var(--space-xs) var(--space-sm); }
       .rate-period[data-single="true"] .period-head { min-height: var(--period-mobile-night); grid-template-rows: auto; padding-block: var(--space-xs) var(--space-2xs); }
-      .rate-period[data-single="true"][data-single-discount="true"] .period-head { min-height: 44px; grid-template-rows: auto; padding: var(--space-sm); }
       .period-axis { width: 100%; min-height: 12px; gap: var(--space-xs); font-size: var(--text-2xs); }
-      .period-night-count { margin-inline-start: auto; gap: var(--space-xs); }
+      .period-night-count { gap: var(--space-xs); }
       .period-terms { min-width: 0; flex-wrap: nowrap; gap: var(--space-xs); font-size: var(--text-2xs); }
-      .discount-equation { gap: 2px; }
       .period-discount { gap: var(--space-xs); padding: 2px 6px; }
       .period-discount small { gap: var(--space-2xs); margin-inline-start: var(--space-xs); padding-inline-start: var(--space-xs); font-size: .5625rem; }
-      .period-rate { align-self: start; }
+      .period-rate { align-self: center; gap: 3px; }
+      .period-rate-old { gap: 2px; }
       .period-rate strong { font-size: var(--text-lg); }
       .night { min-height: var(--period-mobile-night); font-size: var(--text-2xs); }
 
@@ -1684,11 +1696,11 @@
       .dock-coverage { gap: 3px; margin-top: 0; font-size: var(--text-xs); }
       .dock-segments { gap: 3px; }
       .night-mark { width: 12px; height: 12px; }
-      .dock-value { gap: var(--space-xs); margin-top: 5px; padding-bottom: 3px; }
+      .dock-value { margin-top: 5px; padding-bottom: 3px; }
       .dock-current { gap: 3px; }
       .dock-current strong { font-size: 1.65rem; }
       .dock-current > span { font-size: var(--text-2xs); }
-      .dock-old-inline { margin-bottom: 2px; }
+      .dock-price-line { gap: var(--space-xs); }
       .dock-discount { gap: 3px; padding: 2px 6px; }
       .dock-discount strong { font-size: var(--text-sm); }
       .dock-discount small { padding-left: 3px; font-size: .5625rem; }
@@ -1729,7 +1741,7 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">Operational preview · V7.6</span>BRIX Quote Card</h1>
+      <h1><span class="eyebrow">Operational preview · V7.7</span>BRIX Quote Card</h1>
     </div>
   </header>
 
@@ -2072,9 +2084,7 @@
 
     function renderRateMap(data) {
       const pricedPeriods = data.periods.filter(period => period.price != null);
-      const multiRate = pricedPeriods.length > 1;
       const multiSegment = data.periods.length > 1;
-      const singleDiscount = data.periods.length === 1 && Boolean(pricedPeriods[0]?.discount);
       const discountRules = [...new Set(pricedPeriods.filter(period => period.discount && period.rule).map(period => period.rule))];
       const visibleRules = discountRules.slice(0, 2);
       const hiddenRuleCount = Math.max(0, discountRules.length - visibleRules.length);
@@ -2094,26 +2104,36 @@
         const ruleName = firstRuleOccurrence && visibleRuleIndex >= 0 ? period.rule : "";
         const moreRules = ruleName && visibleRuleIndex === visibleRules.length - 1 && hiddenRuleCount ? `<i aria-label="${hiddenRuleCount} more discount rule${hiddenRuleCount === 1 ? "" : "s"}">+${hiddenRuleCount}</i>` : "";
         const discountName = ruleName ? `<small>${ruleName}${moreRules}</small>` : "";
-        const discountEquation = period.discount
-          ? `<span class="discount-equation" aria-label="${period.old ? `€${period.old}, then ` : ""}${period.discount}% discount${period.rule ? `, rule ${period.rule}` : ""}">${period.old ? `<span class="period-origin-rate"><s>€${period.old}</s><i aria-hidden="true">→</i></span>` : ""}<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span></span>`
-          : "";
         const terms = period.missing
           ? `<span>Outside contract</span>`
           : period.discount
-            ? discountEquation
+            ? `<span class="period-discount" aria-label="${period.discount}% discount${period.rule ? `, rule ${period.rule}` : ""}"><strong>−${period.discount}%</strong>${discountName}</span>`
             : "";
-        const rate = period.missing
-          ? `<div class="period-rate"><strong>Unpriced</strong></div>`
-          : multiRate ? `<div class="period-rate"><strong>€${period.price}</strong><span class="period-rate-pp">€${period.pp}/pp</span></div>` : "";
+        const oldRate = period.discount && period.old
+          ? `<span class="period-rate-old"><s>€${period.old}</s><i aria-hidden="true">→</i></span>`
+          : "";
+        const rate = !multiSegment
+          ? ""
+          : period.missing
+            ? `<div class="period-rate"><strong>Unpriced</strong></div>`
+            : `<div class="period-rate">${oldRate}<strong>€${period.price}</strong></div>`;
+        const periodTerms = multiSegment
+          ? `<div class="period-terms" data-empty="${!terms}">${terms || "&nbsp;"}</div>`
+          : "";
+        const periodPp = multiSegment
+          ? `<span class="period-pp" data-empty="${period.price == null}">${period.price == null ? "&nbsp;" : `€${period.pp}/pp`}</span>`
+          : "";
+        const periodPrimary = `<div class="period-primary">${periodAxis}${rate}</div>`;
+        const periodSecondary = multiSegment ? `<div class="period-secondary">${periodTerms}${periodPp}</div>` : "";
         const nights = period.days.map((day, dayIndex) => {
           const stop = stopped.has(dayIndex);
           const markup = `<span class="night" data-state="${stop ? "stop" : period.missing ? "missing" : "open"}" style="--night-i:${Math.min(nightIndex++, 14)}" title="${period.dates} · night ${day}: ${period.missing ? "not priced" : `€${period.price}/night${stop ? " · stop sale" : ""}`}">${day}${stop ? `<i class="stop-mark" aria-label="stop sale">×</i>` : ""}</span>`;
           return markup;
         }).join("");
         const periodLabel = `${period.dates}, ${period.days.length} nights, ${period.price == null ? "not priced" : `€${period.price} per night`}`;
-        return `<article class="rate-period" aria-label="${periodLabel}" data-period="${Math.min(periodIndex + 1,4)}" data-single="${!multiSegment}" data-single-discount="${singleDiscount}" data-discount="${Boolean(period.discount)}" data-missing="${Boolean(period.missing)}" style="--span:${period.days.length};--i:${periodIndex}"><div class="period-head">${periodAxis}${rate}${terms ? `<div class="period-terms">${terms}</div>` : ""}</div><div class="night-line" style="--span:${period.days.length}">${nights}</div></article>`;
+        return `<article class="rate-period" aria-label="${periodLabel}" data-period="${Math.min(periodIndex + 1,4)}" data-single="${!multiSegment}" data-discount="${Boolean(period.discount)}" data-missing="${Boolean(period.missing)}" style="--span:${period.days.length};--i:${periodIndex}"><div class="period-head">${periodPrimary}${periodSecondary}</div><div class="night-line" style="--span:${period.days.length}">${nights}</div></article>`;
       }).join("");
-      const rateMarker = multiRate
+      const rateMarker = multiSegment
         ? `<span class="rate-unit-mark" aria-label="Rates shown per night">${icons.rates}<span>€/N</span></span>`
         : icons.rates;
       return `<section class="rate-map" aria-label="Nightly price schedule" data-scrollable="false">${rateMarker}<div class="rate-scroll"><div class="rate-band">${periods}</div></div><div class="rate-scroll-indicator" aria-hidden="true" hidden><span class="rate-scroll-thumb"></span></div></section>`;
@@ -2160,16 +2180,19 @@
     function renderDock(data) {
       const dock = data.dock;
       const pricedPeriods = data.periods.filter(period => period.price != null);
-      const multiRate = pricedPeriods.length > 1;
-      const singleDiscount = data.periods.length === 1 && Boolean(pricedPeriods[0]?.discount);
+      const multiSegment = data.periods.length > 1;
       const rateCount = new Set(pricedPeriods.map(period => period.price)).size;
+      const rateWord = rateCount === 1 ? "rate" : "rates";
       const margin = data.privateMargin ? `<button class="management-toggle" type="button" aria-expanded="false">Margin</button><div class="management-panel" data-open="false" aria-hidden="true"><div class="management-clip"><div class="margin-row"><div><span>Cost</span><b>${data.privateMargin.cost}</b></div><div><span>Sell</span><b>${data.privateMargin.sell}</b></div><div><span>Profit</span><b>${data.privateMargin.profit}</b></div></div></div></div>` : "";
-      const oldPrice = !singleDiscount && dock.old ? `<span class="dock-old-inline"><span>was</span><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
-      const discount = !singleDiscount && dock.discount ? `<span class="dock-discount" aria-label="${dock.discount.value} discount, rule ${dock.discount.rule}"><strong>${dock.discount.value}</strong><small>${dock.discount.rule}</small></span>` : "";
-      const pricing = multiRate
-        ? `<span class="dock-segments" aria-label="${rateCount} nightly rates">${icons.rates}<strong>${rateCount}</strong><span>rates</span></span>`
-        : `<div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div>${dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}`;
-      return `<aside class="quote-dock" data-rate-mode="${multiRate ? "segments" : "single"}"><div class="dock-summary"><div class="dock-meta">${!multiRate && dock.label ? `<span class="dock-label">${dock.label}</span>` : ""}<span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span>${multiRate ? pricing : ""}</div>${multiRate ? "" : pricing}${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.details}<span>Details</span></button><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
+      const oldPrice = dock.old ? `<span class="dock-old-inline"><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
+      const discountValue = dock.discount?.value.replace(/^[✓↓]\s*/, "") || "";
+      const discount = dock.discount ? `<span class="dock-discount" aria-label="${discountValue} discount, rule ${dock.discount.rule}"><strong>${discountValue}</strong><small>${dock.discount.rule}</small></span>` : "";
+      const currentPrice = `<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span>`;
+      const priceMeta = discount ? `<span class="dock-price-meta">${discount}${dock.range ? `<span class="dock-range-inline">${dock.range}</span>` : ""}</span>` : "";
+      const pricing = multiSegment
+        ? `<span class="dock-segments" aria-label="${rateCount} nightly ${rateWord}">${icons.rates}<strong>${rateCount}</strong><span>${rateWord}</span></span>`
+        : `<div class="dock-value"><div class="dock-price-stack"><span class="dock-price-line">${oldPrice}${currentPrice}</span>${priceMeta}</div></div>${!discount && dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}`;
+      return `<aside class="quote-dock" data-rate-mode="${multiSegment ? "segments" : "single"}" data-single-discount="${Boolean(!multiSegment && dock.discount)}"><div class="dock-summary"><div class="dock-meta">${!multiSegment && dock.label ? `<span class="dock-label">${dock.label}</span>` : ""}<span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span>${multiSegment ? pricing : ""}</div>${multiSegment ? "" : pricing}${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.details}<span>Details</span></button><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
     }
 
     function renderCard(data) {
