@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Operational Quote Ticket V6.6</title>
+  <title>BRIX — Quote Card V6.7</title>
   <style>
     :root {
       --paper: oklch(98.4% 0.007 84);
@@ -389,6 +389,8 @@
       letter-spacing: .055em;
       text-transform: uppercase;
     }
+
+    .tag__short { display: none; }
 
     .tag--best {
       position: relative;
@@ -789,7 +791,6 @@
 
     .signal-title { font-size: var(--text-md); font-weight: var(--weight-bold); line-height: 1.2; }
     .signal-text { max-width: 70ch; color: var(--muted); font-size: var(--text-sm); line-height: 1.35; }
-    .signal-rtl { display: block; width: 100%; text-align: right; }
 
     .review-button {
       min-height: 34px;
@@ -911,7 +912,6 @@
 
     .signal-item b { font-weight: var(--weight-bold); }
     .signal-item span { color: var(--muted); }
-    .item-rtl { display: block; margin-top: 2px; text-align: right; }
 
     .quote-dock {
       grid-area: dock;
@@ -1353,6 +1353,8 @@
       .room-name { font-size: .9375rem; line-height: 1.06; letter-spacing: -.022em; }
       .tag-row { gap: 3px; margin-top: 5px; }
       .tag { padding: 1px 6px; }
+      .tag__full { display: none; }
+      .tag__short { display: inline; }
 
       .occupancy { grid-template-columns: 24px minmax(0, 1fr); gap: 6px; padding: 6px 0 0; }
       .occupancy-mark { width: 24px; height: 22px; }
@@ -1367,7 +1369,7 @@
       .rate-kicker { gap: 6px; font-size: var(--text-xs); }
       .rate-motion-mark { width: 18px; height: 12px; }
       .rate-period { flex-basis: max(116px, calc(var(--span) * 24px)); min-width: max(116px, calc(var(--span) * 24px)); }
-      .period-night-count, .dock-range--period-count { display: none; }
+      .period-night-count { display: none; }
       .period-head { min-height: 36px; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto; gap: 0 var(--space-xs); padding: 3px 6px; }
       .period-head > div:first-child { display: contents; }
       .period-id { grid-column: 1; grid-row: 1; font-size: var(--text-2xs); }
@@ -1438,15 +1440,15 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">BRIX internal result card</span>Operational Quote Ticket · V6.6</h1>
+      <h1><span class="eyebrow">Operational preview · V6.7</span>BRIX Quote Card</h1>
     </div>
   </header>
 
   <main class="workspace">
-    <div class="scenario-head"><span>9 original cases + pressure test</span><span id="scenarioCount">01 / 10</span></div>
+    <div class="scenario-head"><span>10 cases</span><span id="scenarioCount">01 / 10</span></div>
     <nav class="scenario-strip" id="scenarioList" aria-label="Result card scenarios"></nav>
     <section id="preview" aria-live="polite"></section>
-    <footer class="page-foot">Standalone interaction prototype · 01 August 2026</footer>
+    <footer class="page-foot">Interactive prototype · August 2026</footer>
   </main>
 
   <script>
@@ -1468,24 +1470,24 @@
       state: "Ready",
       hotel: "",
       room: "DELUXE ROOM SEA VIEW",
-      tags: [{ text: "Best price", kind: "best" }, { text: "Ultra all inclusive", kind: "board" }],
-      occupancyLabel: "Priced occupancy",
+      tags: [{ text: "Best price", short: "Best", kind: "best" }, { text: "Ultra all inclusive", short: "UAI", kind: "board" }],
+      occupancyLabel: "Priced for",
       party: "2 Adults",
       factor: "×2.5",
       pricedParty: "",
       periods: [{ id: "P1", dates: "03–10 Aug", days: ["03","04","05","06","07","08","09"], price: 210, pp: 105 }],
       signals: [],
-      dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "€105 / person" },
+      dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" },
       cta: "Copy quote",
       privateMargin: null
     };
 
     const scenarios = [
-      { name: "Ordinary", data: { ...base } },
+      { name: "Ready", data: { ...base } },
       { name: "Discount", data: {
         ...base,
         periods: [{ id: "P1", dates: "03–10 Aug", days: ["03","04","05","06","07","08","09"], price: 210, pp: 105, old: 242, discount: 13, rule: "SPO09" }],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "€105 / person", old: "€242", discount: { value: "✓ −13%", rule: "SPO09" } }
+        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp", old: "€242", discount: { value: "✓ −13%", rule: "SPO09" } }
       }},
       { name: "2 periods", data: {
         ...base,
@@ -1496,7 +1498,7 @@
           { id: "P1", dates: "28–31 Aug", days: ["28","29","30"], price: 210, pp: 105, old: 242, discount: 13, rule: "SPO09" },
           { id: "P2", dates: "01–04 Sep", days: ["01","02","03"], price: 165, pp: 82.5 }
         ],
-        dock: { label: "Rate range", coverage: "6 nights", value: "€165–210", unit: "/ night", range: "2 periods" }
+        dock: { label: "Rate range", coverage: "6 nights", value: "€165–210", unit: "/night", range: "" }
       }},
       { name: "Stop sale", data: {
         ...base,
@@ -1504,28 +1506,28 @@
         stateMark: "×",
         state: "Blocked",
         periods: [{ id: "P1", dates: "03–10 Aug", days: ["03","04","05","06","07","08","09"], price: 210, pp: 105, stopDays: [2,3,4] }],
-        signals: [{ kind: "blocked", title: "3 nights are stopped", text: "05–07 Aug cannot be confirmed. Supplier update: 31 Jul, 18:42.", rtl: "راجع المورّد قبل التأكيد." }],
-        dock: { label: "Reference rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "Reference only" },
-        cta: "Copy with stop note"
+        signals: [{ kind: "blocked", title: "3 stopped nights", text: "05–07 Aug · check supplier · updated 31 Jul 18:42." }],
+        dock: { label: "Reference rate", coverage: "7 nights", value: "€210", unit: "/night", range: "" },
+        cta: "Copy + stop note"
       }},
-      { name: "7 alerts", data: {
+      { name: "Alerts", data: {
         ...base,
         tone: "warn",
         stateMark: "!",
-        state: "Action required",
+        state: "Action",
         room: "FAMILY SUITE GARDEN VIEW",
         party: "2 Adults + 2 Children",
         factor: "×3.6",
         signals: [
-          { kind: "action", title: "Early-booking deadline", text: "Confirm before 18:00 tomorrow." },
-          { kind: "opportunity", title: "Long-stay discount", text: "Eligible, but not included.", rtl: "الخصم متاح ولم يُطبّق." },
-          { kind: "opportunity", title: "Honeymoon offer", text: "Select it and request the certificate.", rtl: "فعّل العرض واطلب الشهادة." },
-          { kind: "action", title: "Payment deadline", text: "Full payment is due 30 days before arrival." },
-          { kind: "action", title: "Extra-person charge", text: "Base 6 + 2 extra at €45 per person per night." },
-          { kind: "action", title: "Age validation · child 1", text: "Age 12.4 exceeds the 11.99 ceiling." },
-          { kind: "applied", title: "Senior discount", text: "Already included in the quote." }
+          { kind: "action", title: "Confirm by 18:00 tomorrow", text: "" },
+          { kind: "opportunity", title: "Long-stay discount", text: "Eligible; not applied." },
+          { kind: "opportunity", title: "Honeymoon", text: "Select; request certificate." },
+          { kind: "action", title: "Payment", text: "Due 30 days before arrival." },
+          { kind: "action", title: "2 extra guests", text: "€45/guest/night · base 6." },
+          { kind: "action", title: "Child 1 age", text: "12.4 > 11.99." },
+          { kind: "applied", title: "Senior discount", text: "Included." }
         ],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "€105 / person" }
+        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
       }},
       { name: "Occupancy", data: {
         ...base,
@@ -1533,18 +1535,18 @@
         stateMark: "≈",
         state: "Reference",
         room: "FAMILY SUITE GARDEN VIEW",
-        occupancyLabel: "Searched occupancy",
+        occupancyLabel: "Searched",
         party: "2 Adults + 2 Children",
         factor: "×3.1",
-        pricedParty: "Priced as · 2 Adults + 1 Child",
+        pricedParty: "Matched: 2 Adults + 1 Child",
         signals: [
-          { kind: "action", title: "Choose an exact occupancy", text: "This is the nearest contract match, not an exact quote." },
-          { kind: "info", title: "Available alternatives", text: "2A + 1C · 3A · 2A + 2C in two rooms." }
+          { kind: "action", title: "Choose exact occupancy", text: "Nearest match only." },
+          { kind: "info", title: "Alternatives", text: "2A + 1C · 3A · 2A + 2C in two rooms." }
         ],
-        dock: { label: "Reference rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "€105 / person" },
-        cta: "Copy as reference"
+        dock: { label: "Reference rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" },
+        cta: "Copy reference"
       }},
-      { name: "Price notes", data: {
+      { name: "Notes", data: {
         ...base,
         tone: "info",
         stateMark: "i",
@@ -1553,11 +1555,11 @@
         party: "2 Adults + 2 Children + 1 Infant",
         factor: "×4.0",
         signals: [
-          { kind: "info", title: "Infant is free", text: "The amount is unchanged with or without the infant." },
-          { kind: "info", title: "Promoted occupancy", text: "Children were converted under the contract rule." },
-          { kind: "info", title: "Long-stay floor", text: "The shorter-stay rate protects this quote." }
+          { kind: "info", title: "Infant free", text: "No rate change." },
+          { kind: "info", title: "Promoted occupancy", text: "Contract conversion applied." },
+          { kind: "info", title: "Long-stay floor", text: "Short-stay rate protects quote." }
         ],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/ night", range: "€105 / person" }
+        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
       }},
       { name: "Adjusted", data: {
         ...base,
@@ -1569,20 +1571,20 @@
           { id: "P1", dates: "03–24 Aug", days: Array.from({ length: 21 }, (_,i) => String(i + 3).padStart(2,"0")), price: 231, pp: 115.5 },
           { id: "GAP", dates: "24–30 Aug", days: ["24","25","26","27","28","29","30"], price: null, missing: true }
         ],
-        signals: [{ kind: "action", title: "7 nights are outside the contract", text: "The €231 operative rate covers only the 21 priced nights." }],
-        dock: { label: "Operative rate", coverage: "21 priced nights", value: "€231", unit: "/ night", range: "€115.5 / person", base: "Base sell €210 · +10% override" },
-        cta: "Copy adjusted quote",
+        signals: [{ kind: "action", title: "7 unpriced nights", text: "€231 covers 21 nights." }],
+        dock: { label: "Operative rate", coverage: "21 nights", value: "€231", unit: "/night", range: "€115.5/pp", base: "Base €210 · +10% override" },
+        cta: "Copy adjusted",
         privateMargin: { cost: "€186", sell: "€231", profit: "+€45" }
       }},
-      { name: "Hotel header", data: {
+      { name: "Hotel", data: {
         ...base,
         hotel: "SUENO DELUXE BELEK · ANTALYA"
       }},
-      { name: "Stress · 18", data: {
+      { name: "Stress", data: {
         ...base,
         tone: "block",
         stateMark: "!",
-        state: "Blocked · review required",
+        state: "Blocked",
         room: "GRAND FAMILY SUITE — PRIVATE POOL & SEA VIEW WITH CONNECTING ROOM",
         party: "4 Adults + 3 Children + 1 Infant",
         factor: "×5.5",
@@ -1592,41 +1594,41 @@
           { id: "P3", dates: "08–10 Aug", days: ["08","09"], price: 220, pp: 110, old: 239, discount: 8, rule: "EB10" }
         ],
         signals: [
-          { kind: "blocked", title: "Excluded market", text: "The guest market is restricted for this contract." },
-          { kind: "action", title: "Early-booking deadline", text: "Confirm before 18:00 tomorrow." },
-          { kind: "action", title: "Payment deadline", text: "Full payment is due 30 days before arrival." },
-          { kind: "action", title: "Extra-person charge", text: "Base 6 + 2 extra at €45 per person per night." },
-          { kind: "action", title: "Age validation · child 1", text: "Age 12.4 exceeds ceiling 11.99." },
-          { kind: "action", title: "Age validation · child 2", text: "Age 12.1 exceeds ceiling 11.99." },
-          { kind: "action", title: "Age validation · child 3", text: "Age 13.0 exceeds ceiling 11.99." },
-          { kind: "opportunity", title: "Long-stay −10%", text: "Eligible, but not applied.", rtl: "الخصم متاح ولم يُطبّق." },
-          { kind: "opportunity", title: "Honeymoon offer", text: "Requires selection and certificate.", rtl: "فعّل الخيار واطلب الشهادة." },
+          { kind: "blocked", title: "Market excluded", text: "Check contract market." },
+          { kind: "action", title: "Confirm by 18:00 tomorrow", text: "" },
+          { kind: "action", title: "Payment", text: "Due 30 days before arrival." },
+          { kind: "action", title: "2 extra guests", text: "€45/guest/night · base 6." },
+          { kind: "action", title: "Child 1 age", text: "12.4 > 11.99." },
+          { kind: "action", title: "Child 2 age", text: "12.1 > 11.99." },
+          { kind: "action", title: "Child 3 age", text: "13.0 > 11.99." },
+          { kind: "opportunity", title: "Long-stay −10%", text: "Eligible; not applied." },
+          { kind: "opportunity", title: "Honeymoon", text: "Select; request certificate." },
           { kind: "applied", title: "P1 · SPO09 −11.5%", text: "03–05 Aug only.", placement: "rate" },
           { kind: "applied", title: "P3 · EB10 −8%", text: "08–10 Aug only.", placement: "rate" },
-          { kind: "applied", title: "Senior discount", text: "Already included." },
-          { kind: "info", title: "Passport channel", text: "Book selected passports through the named source." },
-          { kind: "info", title: "Source restriction", text: "Contact the supplier before confirmation." },
-          { kind: "info", title: "Infant is free", text: "The amount is unchanged." },
-          { kind: "info", title: "Promoted occupancy", text: "Children were converted under the contract rule." },
-          { kind: "info", title: "Long-stay floor", text: "The shorter-stay rate protects this quote." },
-          { kind: "private", title: "Management pricing", text: "Open management details to review cost and profit." }
+          { kind: "applied", title: "Senior discount", text: "Included." },
+          { kind: "info", title: "Passport channel", text: "Use named source." },
+          { kind: "info", title: "Source restriction", text: "Check supplier." },
+          { kind: "info", title: "Infant free", text: "No rate change." },
+          { kind: "info", title: "Promoted occupancy", text: "Contract conversion applied." },
+          { kind: "info", title: "Long-stay floor", text: "Short-stay rate protects quote." },
+          { kind: "private", title: "Margin", text: "Open cost and profit." }
         ],
-        dock: { label: "Rate range", coverage: "7 nights", value: "€205–231", unit: "/ night", range: "3 periods" },
-        cta: "Copy after review",
+        dock: { label: "Rate range", coverage: "7 nights", value: "€205–231", unit: "/night", range: "" },
+        cta: "Review → Copy",
         privateMargin: { cost: "€186", sell: "€205–231", profit: "+€19–45" }
       }}
     ];
 
     const groupMeta = {
       blocked: { label: "Blocked", color: "var(--red)", soft: "var(--red-soft)", symbol: "×" },
-      action: { label: "Action required", color: "var(--gold)", soft: "var(--gold-soft)", symbol: "!" },
+      action: { label: "Action", color: "var(--gold)", soft: "var(--gold-soft)", symbol: "!" },
       opportunity: { label: "Available", color: "oklch(48% 0.1 82)", soft: "var(--gold-soft)", symbol: "+" },
-      applied: { label: "Already applied", color: "var(--pine-650)", soft: "var(--pine-100)", symbol: "✓" },
-      info: { label: "Explanation", color: "var(--blue)", soft: "var(--blue-soft)", symbol: "i" },
+      applied: { label: "Applied", color: "var(--pine-650)", soft: "var(--pine-100)", symbol: "✓" },
+      info: { label: "Info", color: "var(--blue)", soft: "var(--blue-soft)", symbol: "i" },
       private: { label: "Management", color: "var(--plum)", soft: "var(--plum-soft)", symbol: "▣" }
     };
 
-    const tagMarkup = tag => `<span class="tag tag--${tag.kind}">${tag.text}</span>`;
+    const tagMarkup = tag => `<span class="tag tag--${tag.kind}" aria-label="${tag.text}" title="${tag.text}"><span class="tag__full">${tag.text}</span><span class="tag__short" aria-hidden="true">${tag.short || tag.text}</span></span>`;
 
     function canonicalSignals(data) {
       return data.signals.filter(signal => signal.placement !== "rate");
@@ -1647,7 +1649,7 @@
               : ""
             : multiRate ? `<span>€${period.pp}/pp</span>` : "";
         const rate = period.missing
-          ? `<div class="period-rate"><strong>Not priced</strong><span>gap</span></div>`
+          ? `<div class="period-rate"><strong>Unpriced</strong></div>`
           : multiRate ? `<div class="period-rate"><strong>€${period.price}</strong><span>/ night</span></div>` : "";
         const nights = period.days.map((day, dayIndex) => {
           const stop = stopped.has(dayIndex);
@@ -1656,7 +1658,7 @@
         }).join("");
         return `<article class="rate-period" data-period="${Math.min(periodIndex + 1,4)}" data-discount="${Boolean(period.discount)}" data-missing="${Boolean(period.missing)}" style="--span:${period.days.length};--i:${periodIndex}"><div class="period-head"><div><span class="period-id">${period.id}${periodCount}</span><span class="period-dates">${period.dates}</span>${terms ? `<div class="period-terms">${terms}</div>` : ""}</div>${rate}</div><div class="night-line" style="--span:${period.days.length}">${nights}</div></article>`;
       }).join("");
-      return `<section class="rate-map"><div class="rate-map__head"><span class="rate-kicker">${icons.rates}<span>Rates by night</span></span></div><div class="rate-scroll"><div class="rate-band">${periods}</div></div></section>`;
+      return `<section class="rate-map"><div class="rate-map__head"><span class="rate-kicker">${icons.rates}<span>Nightly rates</span></span></div><div class="rate-scroll"><div class="rate-band">${periods}</div></div></section>`;
     }
 
     function groupSignals(signals) {
@@ -1668,7 +1670,7 @@
 
     function renderSignalGroups(signals) {
       const groups = groupSignals(signals);
-      return Object.entries(groupMeta).filter(([kind]) => groups[kind]?.length).map(([kind, meta]) => `<section style="--group-color:${meta.color};--group-soft:${meta.soft}"><div class="group-head"><span class="group-title">${meta.label}</span><span class="group-count">${groups[kind].length}</span></div>${groups[kind].map(signal => `<div class="signal-item"><span class="signal-symbol" aria-hidden="true">${meta.symbol}</span><div><b>${signal.title}</b> <span>— ${signal.text}</span>${signal.rtl ? `<span class="item-rtl" dir="rtl">${signal.rtl}</span>` : ""}</div></div>`).join("")}</section>`).join("");
+      return Object.entries(groupMeta).filter(([kind]) => groups[kind]?.length).map(([kind, meta]) => `<section style="--group-color:${meta.color};--group-soft:${meta.soft}"><div class="group-head"><span class="group-title">${meta.label}</span><span class="group-count">${groups[kind].length}</span></div>${groups[kind].map(signal => `<div class="signal-item"><span class="signal-symbol" aria-hidden="true">${meta.symbol}</span><div><b>${signal.title}</b>${signal.text ? ` <span>· ${signal.text}</span>` : ""}</div></div>`).join("")}</section>`).join("");
     }
 
     function renderSignals(data) {
@@ -1678,9 +1680,9 @@
       const primary = primaryIndex >= 0 ? signals[primaryIndex] : null;
       const drawerSignals = primary ? signals.filter((_, index) => index !== primaryIndex) : signals;
       const summary = primary
-        ? `<div class="signal-copy"><span class="signal-label">Do first</span><b class="signal-title">${primary.title}</b><span class="signal-text">${primary.text}</span>${primary.rtl ? `<span class="signal-text signal-rtl" dir="rtl">${primary.rtl}</span>` : ""}</div>`
-        : `<div class="signal-copy"><b class="signal-title">Calculation notes</b></div>`;
-      const button = drawerSignals.length ? `<button class="review-button" type="button" aria-expanded="false">${primary ? `Review ${drawerSignals.length}` : `View ${drawerSignals.length}`}</button>` : "";
+        ? `<div class="signal-copy"><span class="signal-label">Do first</span><b class="signal-title">${primary.title}</b>${primary.text ? `<span class="signal-text">${primary.text}</span>` : ""}</div>`
+        : `<div class="signal-copy"><b class="signal-title">Notes</b></div>`;
+      const button = drawerSignals.length ? `<button class="review-button" type="button" aria-expanded="false" aria-label="Review ${drawerSignals.length} more alerts">+${drawerSignals.length}</button>` : "";
       const drawer = drawerSignals.length ? `<div class="signal-drawer" data-open="false" aria-hidden="true"><div class="drawer-clip"><div class="drawer-scroll"><div class="signal-groups">${renderSignalGroups(drawerSignals)}</div></div></div></div>` : "";
       return { summary: `<section class="signal-zone"><div class="signal-summary">${summary}${button}</div></section>`, drawer };
     }
@@ -1696,11 +1698,10 @@
 
     function renderDock(data) {
       const dock = data.dock;
-      const margin = data.privateMargin ? `<button class="management-toggle" type="button" aria-expanded="false">Management values</button><div class="management-panel" data-open="false" aria-hidden="true"><div class="management-clip"><div class="margin-row"><div><span>Cost</span><b>${data.privateMargin.cost}</b></div><div><span>Sell</span><b>${data.privateMargin.sell}</b></div><div><span>Profit</span><b>${data.privateMargin.profit}</b></div></div></div></div>` : "";
+      const margin = data.privateMargin ? `<button class="management-toggle" type="button" aria-expanded="false">Margin</button><div class="management-panel" data-open="false" aria-hidden="true"><div class="management-clip"><div class="margin-row"><div><span>Cost</span><b>${data.privateMargin.cost}</b></div><div><span>Sell</span><b>${data.privateMargin.sell}</b></div><div><span>Profit</span><b>${data.privateMargin.profit}</b></div></div></div></div>` : "";
       const oldPrice = dock.old ? `<span class="dock-old-inline"><span>was</span><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
       const discount = dock.discount ? `<span class="dock-discount" aria-label="${dock.discount.value} discount, rule ${dock.discount.rule}"><strong>${dock.discount.value}</strong><small>${dock.discount.rule}</small></span>` : "";
-      const rangeClass = /^\d+\s+periods?$/i.test(dock.range) ? " dock-range--period-count" : "";
-      return `<aside class="quote-dock"><div class="dock-summary"><div class="dock-meta"><span class="dock-label">${dock.label}</span><span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span></div><div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div><p class="dock-range${rangeClass}">${dock.range}</p>${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
+      return `<aside class="quote-dock"><div class="dock-summary"><div class="dock-meta"><span class="dock-label">${dock.label}</span><span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span></div><div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div>${dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
     }
 
     function renderCard(data) {
@@ -1724,6 +1725,7 @@
           drawer.setAttribute("aria-hidden", String(!open));
           review.setAttribute("aria-expanded", String(open));
           review.textContent = open ? "Close" : closedText;
+          review.setAttribute("aria-label", open ? "Close alerts" : `Review ${closedText.slice(1)} more alerts`);
         });
       }
 
@@ -1735,7 +1737,7 @@
           panel.dataset.open = String(open);
           panel.setAttribute("aria-hidden", String(!open));
           management.setAttribute("aria-expanded", String(open));
-          management.textContent = open ? "Hide management values" : "Management values";
+          management.textContent = open ? "Close margin" : "Margin";
         });
       }
 
@@ -1746,7 +1748,7 @@
         try {
           await navigator.clipboard.writeText(decodeURIComponent(copy.dataset.copy));
           copy.dataset.copied = "true";
-          copyLabel.textContent = "Quote copied";
+          copyLabel.textContent = "Copied";
         } catch {
           copyLabel.textContent = "Preview only";
         }
