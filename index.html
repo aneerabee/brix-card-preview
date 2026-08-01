@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Quote Card V7.3</title>
+  <title>BRIX — Quote Card V7.4</title>
   <link rel="icon" href="data:,">
   <style>
     :root {
@@ -594,6 +594,10 @@
     }
 
     .rate-map {
+      --period-mobile-width: 10.5rem;
+      --period-mobile-head: 48px;
+      --period-mobile-night: 24px;
+      --period-rate-column: 4.25rem;
       position: relative;
       padding: var(--space-sm) var(--space-lg) var(--space-md);
       border-top: 1px solid var(--line-soft);
@@ -669,6 +673,8 @@
     .rate-band {
       min-width: 100%;
       display: flex;
+      align-items: stretch;
+      background: var(--paper);
       border: 1px solid var(--line);
     }
 
@@ -686,7 +692,7 @@
       animation: period-unfold 420ms var(--ease-out) calc(100ms + var(--i) * 70ms) both;
     }
 
-    .rate-period:last-child { border-right: 0; }
+    .rate-period:last-child { border-right-color: transparent; }
     .rate-period[data-period="2"] { --period: var(--gold); --period-soft: var(--gold-soft); }
     .rate-period[data-period="3"] { --period: var(--blue); --period-soft: var(--blue-soft); }
     .rate-period[data-period="4"] { --period: var(--plum); --period-soft: var(--plum-soft); }
@@ -819,6 +825,8 @@
 
     .period-rate {
       grid-area: rate;
+      inline-size: var(--period-rate-column);
+      min-width: var(--period-rate-column);
       color: var(--period);
       text-align: right;
       white-space: nowrap;
@@ -846,6 +854,8 @@
       text-decoration-color: var(--red);
       text-decoration-thickness: 1.5px;
     }
+
+    .period-rate-old[data-empty="true"] { visibility: hidden; }
 
     .night-line {
       display: grid;
@@ -1568,25 +1578,26 @@
       .factor { margin-left: 2px; padding-inline: 4px; }
       .priced-party { width: 100%; margin-top: 0; font-size: var(--text-2xs); }
 
-      .rate-map { padding: 5px 10px 7px; }
+      .rate-map { padding: var(--space-xs) var(--space-sm) var(--space-sm); }
       .rate-scroll { scroll-snap-type: inline mandatory; }
       .rate-motion-mark { width: 18px; height: 12px; }
-      .rate-map > .rate-motion-mark { inset-block-start: -6px; inset-inline-end: 10px; padding-inline: 4px; }
-      .rate-unit-mark { inset-block-start: -7px; inset-inline-end: 10px; padding-inline: 4px; }
+      .rate-map > .rate-motion-mark { inset-block-start: -6px; inset-inline-end: var(--space-sm); padding-inline: var(--space-xs); }
+      .rate-unit-mark { inset-block-start: -7px; inset-inline-end: var(--space-sm); padding-inline: var(--space-xs); }
       .rate-unit-mark .rate-motion-mark { width: 15px; height: 10px; }
-      .rate-period { flex-basis: max(9.75rem, calc(var(--span) * 26px)); min-width: max(9.75rem, calc(var(--span) * 26px)); }
-      .result-card[data-period-count="2"] .rate-period { flex-basis: max(9rem, calc(var(--span) * 26px)); min-width: max(9rem, calc(var(--span) * 26px)); }
-      .period-head { min-height: 42px; gap: 4px 6px; padding: 5px 7px 4px; }
-      .rate-period[data-single="true"] .period-head { min-height: 22px; padding-block: 4px 2px; }
-      .period-axis { min-height: 11px; font-size: var(--text-2xs); }
-      .period-terms { min-width: 0; flex-wrap: nowrap; gap: 5px; font-size: var(--text-2xs); }
+      .rate-period { flex-grow: 1; flex-basis: max(var(--period-mobile-width), calc(var(--span) * 28px)); min-width: max(var(--period-mobile-width), calc(var(--span) * 28px)); }
+      .result-card[data-period-count="2"] .rate-period { flex-basis: max(9rem, calc(var(--span) * 28px)); min-width: max(9rem, calc(var(--span) * 28px)); }
+      .period-head { min-height: var(--period-mobile-head); grid-template-rows: minmax(24px, auto) minmax(16px, auto); gap: var(--space-xs) var(--space-sm); padding: var(--space-xs) var(--space-sm); }
+      .rate-period[data-single="true"] .period-head { min-height: var(--period-mobile-night); grid-template-rows: auto; padding-block: var(--space-xs) var(--space-2xs); }
+      .period-axis { width: 100%; min-height: 12px; gap: var(--space-xs); font-size: var(--text-2xs); }
+      .period-night-count { margin-inline-start: auto; gap: var(--space-xs); }
+      .period-terms { min-width: 0; flex-wrap: nowrap; gap: var(--space-xs); font-size: var(--text-2xs); }
       .period-pp { margin-inline-start: auto; white-space: nowrap; }
-      .period-discount { gap: 3px; padding: 1px 5px; }
-      .period-discount small { gap: 2px; margin-inline-start: 3px; padding-inline-start: 3px; font-size: .5rem; }
+      .period-discount { gap: var(--space-xs); padding: var(--space-2xs) var(--space-xs); }
+      .period-discount small { gap: var(--space-2xs); margin-inline-start: var(--space-xs); padding-inline-start: var(--space-xs); font-size: .5rem; }
       .period-rate { align-self: start; }
       .period-rate strong { font-size: var(--text-lg); }
-      .period-rate .period-rate-old { margin-bottom: 2px; }
-      .night { min-height: 22px; font-size: var(--text-2xs); }
+      .period-rate .period-rate-old { min-height: var(--text-2xs); margin-bottom: var(--space-2xs); }
+      .night { min-height: var(--period-mobile-night); font-size: var(--text-2xs); }
 
       .signal-zone { padding: 5px 10px 7px; }
       .signal-summary { min-height: 44px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 6px; padding: 6px 8px; }
@@ -1650,7 +1661,7 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">Operational preview · V7.3</span>BRIX Quote Card</h1>
+      <h1><span class="eyebrow">Operational preview · V7.4</span>BRIX Quote Card</h1>
     </div>
   </header>
 
@@ -2021,9 +2032,11 @@
               ? `<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span><span class="period-pp">€${period.pp}/pp</span>`
               : ""
             : multiRate ? `<span class="period-pp">€${period.pp}/pp</span>` : "";
-        const oldRate = period.discount && period.old ? `<span class="period-rate-old"><s>€${period.old}</s></span>` : "";
+        const oldRate = period.discount && period.old
+          ? `<span class="period-rate-old"><s>€${period.old}</s></span>`
+          : `<span class="period-rate-old" data-empty="true" aria-hidden="true">&nbsp;</span>`;
         const rate = period.missing
-          ? `<div class="period-rate"><strong>Unpriced</strong></div>`
+          ? `<div class="period-rate">${multiRate ? oldRate : ""}<strong>Unpriced</strong></div>`
           : multiRate ? `<div class="period-rate">${oldRate}<strong>€${period.price}</strong></div>` : "";
         const nights = period.days.map((day, dayIndex) => {
           const stop = stopped.has(dayIndex);
