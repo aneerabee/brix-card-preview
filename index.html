@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Quote Card V7.5</title>
+  <title>BRIX — Quote Card V7.6</title>
   <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper: oklch(98.4% 0.007 84);
@@ -32,20 +35,20 @@
       --space-md: 12px;
       --space-lg: 16px;
       --space-xl: 24px;
-      --text-2xs: .5625rem;
-      --text-xs: .625rem;
-      --text-sm: .6875rem;
-      --text-md: .75rem;
-      --text-lg: .875rem;
-      --text-title: 1.0625rem;
+      --text-2xs: .625rem;
+      --text-xs: .6875rem;
+      --text-sm: .75rem;
+      --text-md: .8125rem;
+      --text-lg: .9375rem;
+      --text-title: 1.125rem;
       --text-price: 2rem;
       --weight-medium: 500;
       --weight-semibold: 600;
       --weight-bold: 700;
       --weight-extrabold: 800;
-      --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      --font-data: "Fira Code", "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+      --font-ui: "Geist", "Avenir Next", "Segoe UI", sans-serif;
+      --font-display: "Geist", "Avenir Next", "Segoe UI", sans-serif;
+      --font-data: "Geist Mono", "SFMono-Regular", Consolas, monospace;
       --duration-fast: 120ms;
       --duration-state: 260ms;
       --duration-enter: 460ms;
@@ -55,7 +58,12 @@
 
     * { box-sizing: border-box; }
 
-    html { background: var(--canvas); }
+    html {
+      background: var(--canvas);
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
 
     body {
       min-width: 320px;
@@ -67,9 +75,7 @@
       font-family: var(--font-ui);
       font-size: 1rem;
       line-height: 1.45;
-      font-kerning: normal;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
+      font-synthesis: none;
     }
 
     button { font: inherit; }
@@ -326,24 +332,25 @@
       }
     }
 
-    .scenario-head,
     .scenario__number,
     .party,
     .factor,
     .priced-party,
     .period-axis,
-    .period-terms,
+    .period-origin-rate,
+    .period-discount,
     .period-rate,
+    .period-rate-pp,
     .night,
-    .dock-coverage,
-    .dock-old,
+    .dock-segments strong,
+    .dock-old-inline,
     .dock-value,
     .dock-range,
-    .dock-base,
-    .margin-row,
+    .margin-row b,
     .group-count {
       font-family: var(--font-data);
       font-variant-ligatures: none;
+      font-variant-numeric: tabular-nums lining-nums;
     }
 
     .result-card[data-tone="warn"] { --tone: var(--gold); --tone-soft: var(--gold-soft); }
@@ -777,14 +784,25 @@
       justify-self: stretch;
       justify-content: center;
       flex-wrap: nowrap;
-      gap: var(--space-sm);
+    }
+
+    .discount-equation {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-width: 0;
+      color: var(--period);
+      white-space: nowrap;
     }
 
     .period-origin-rate {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-xs);
+      gap: 3px;
       color: var(--muted);
+      font-size: var(--text-2xs);
+      font-weight: var(--weight-semibold);
+      line-height: 1;
       white-space: nowrap;
     }
 
@@ -797,6 +815,7 @@
       color: var(--period);
       font-style: normal;
       font-weight: var(--weight-bold);
+      transform: translateY(-.25px);
     }
 
     .period-axis {
@@ -842,12 +861,14 @@
     .period-discount {
       display: inline-flex;
       align-items: center;
-      padding: var(--space-2xs) var(--space-sm);
+      min-height: 18px;
+      padding: 2px 7px;
       background: var(--period);
       color: var(--paper);
       box-shadow: 0 1px 0 color-mix(in oklch, var(--period) 45%, transparent);
       font-weight: var(--weight-bold);
-      letter-spacing: .02em;
+      line-height: 1;
+      letter-spacing: .01em;
     }
 
     .period-discount::before {
@@ -865,7 +886,7 @@
       margin-inline-start: 5px;
       padding-inline-start: 5px;
       border-inline-start: 1px solid color-mix(in oklch, var(--paper) 34%, transparent);
-      font-size: var(--text-2xs);
+      font-size: .5625rem;
       font-weight: var(--weight-bold);
       letter-spacing: .04em;
     }
@@ -894,21 +915,15 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .period-rate .period-rate-old {
+    .period-rate-pp {
       display: block;
-      margin-bottom: 3px;
+      margin-top: 3px;
       color: var(--muted);
       font-size: var(--text-2xs);
       font-weight: var(--weight-semibold);
       line-height: 1;
+      letter-spacing: -.01em;
     }
-
-    .period-rate-old s {
-      text-decoration-color: var(--red);
-      text-decoration-thickness: 1.5px;
-    }
-
-    .period-rate-old[data-empty="true"] { visibility: hidden; }
 
     .night-line {
       display: grid;
@@ -1645,12 +1660,11 @@
       .period-axis { width: 100%; min-height: 12px; gap: var(--space-xs); font-size: var(--text-2xs); }
       .period-night-count { margin-inline-start: auto; gap: var(--space-xs); }
       .period-terms { min-width: 0; flex-wrap: nowrap; gap: var(--space-xs); font-size: var(--text-2xs); }
-      .period-pp { margin-inline-start: auto; white-space: nowrap; }
-      .period-discount { gap: var(--space-xs); padding: var(--space-2xs) var(--space-xs); }
-      .period-discount small { gap: var(--space-2xs); margin-inline-start: var(--space-xs); padding-inline-start: var(--space-xs); font-size: .5rem; }
+      .discount-equation { gap: 2px; }
+      .period-discount { gap: var(--space-xs); padding: 2px 6px; }
+      .period-discount small { gap: var(--space-2xs); margin-inline-start: var(--space-xs); padding-inline-start: var(--space-xs); font-size: .5625rem; }
       .period-rate { align-self: start; }
       .period-rate strong { font-size: var(--text-lg); }
-      .period-rate .period-rate-old { min-height: var(--text-2xs); margin-bottom: var(--space-2xs); }
       .night { min-height: var(--period-mobile-night); font-size: var(--text-2xs); }
 
       .signal-zone { padding: 5px 10px 7px; }
@@ -1677,7 +1691,7 @@
       .dock-old-inline { margin-bottom: 2px; }
       .dock-discount { gap: 3px; padding: 2px 6px; }
       .dock-discount strong { font-size: var(--text-sm); }
-      .dock-discount small { padding-left: 3px; font-size: .5rem; }
+      .dock-discount small { padding-left: 3px; font-size: .5625rem; }
       .dock-range, .dock-base { margin-top: 3px; font-size: var(--text-2xs); }
       .management-toggle { margin-top: var(--space-xs); padding: var(--space-xs) 6px; }
       .margin-row { gap: 3px; padding-top: 5px; }
@@ -1687,7 +1701,7 @@
       .copy-button::before, .copy-button svg { width: 24px; height: 24px; border-radius: 7px 2px 7px 2px; }
       .copy-button svg { padding: 6px; }
       .tool-row { margin-top: var(--space-xs); border-radius: 8px 2px 8px 2px; }
-      .tool-button { gap: 1px; font-size: .5rem; }
+      .tool-button { gap: 1px; font-size: .5625rem; }
       .tool-button svg { width: 12px; height: 12px; }
     }
 
@@ -1715,7 +1729,7 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">Operational preview · V7.5</span>BRIX Quote Card</h1>
+      <h1><span class="eyebrow">Operational preview · V7.6</span>BRIX Quote Card</h1>
     </div>
   </header>
 
@@ -2080,21 +2094,17 @@
         const ruleName = firstRuleOccurrence && visibleRuleIndex >= 0 ? period.rule : "";
         const moreRules = ruleName && visibleRuleIndex === visibleRules.length - 1 && hiddenRuleCount ? `<i aria-label="${hiddenRuleCount} more discount rule${hiddenRuleCount === 1 ? "" : "s"}">+${hiddenRuleCount}</i>` : "";
         const discountName = ruleName ? `<small>${ruleName}${moreRules}</small>` : "";
+        const discountEquation = period.discount
+          ? `<span class="discount-equation" aria-label="${period.old ? `€${period.old}, then ` : ""}${period.discount}% discount${period.rule ? `, rule ${period.rule}` : ""}">${period.old ? `<span class="period-origin-rate"><s>€${period.old}</s><i aria-hidden="true">→</i></span>` : ""}<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span></span>`
+          : "";
         const terms = period.missing
           ? `<span>Outside contract</span>`
           : period.discount
-            ? multiRate
-              ? `<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span><span class="period-pp">€${period.pp}/pp</span>`
-              : singleDiscount
-                ? `${period.old ? `<span class="period-origin-rate"><s>€${period.old}</s><i aria-hidden="true">→</i></span>` : ""}<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span>`
-                : ""
-            : multiRate ? `<span class="period-pp">€${period.pp}/pp</span>` : "";
-        const oldRate = period.discount && period.old
-          ? `<span class="period-rate-old"><s>€${period.old}</s></span>`
-          : `<span class="period-rate-old" data-empty="true" aria-hidden="true">&nbsp;</span>`;
+            ? discountEquation
+            : "";
         const rate = period.missing
-          ? `<div class="period-rate">${multiRate ? oldRate : ""}<strong>Unpriced</strong></div>`
-          : multiRate ? `<div class="period-rate">${oldRate}<strong>€${period.price}</strong></div>` : "";
+          ? `<div class="period-rate"><strong>Unpriced</strong></div>`
+          : multiRate ? `<div class="period-rate"><strong>€${period.price}</strong><span class="period-rate-pp">€${period.pp}/pp</span></div>` : "";
         const nights = period.days.map((day, dayIndex) => {
           const stop = stopped.has(dayIndex);
           const markup = `<span class="night" data-state="${stop ? "stop" : period.missing ? "missing" : "open"}" style="--night-i:${Math.min(nightIndex++, 14)}" title="${period.dates} · night ${day}: ${period.missing ? "not priced" : `€${period.price}/night${stop ? " · stop sale" : ""}`}">${day}${stop ? `<i class="stop-mark" aria-label="stop sale">×</i>` : ""}</span>`;
