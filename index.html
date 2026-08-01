@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Quote Card V7.4</title>
+  <title>BRIX — Quote Card V7.5</title>
   <link rel="icon" href="data:,">
   <style>
     :root {
@@ -658,20 +658,38 @@
     }
 
     .rate-scroll {
-      overflow-x: auto;
+      overflow-x: hidden;
       overscroll-behavior-inline: contain;
       scroll-snap-type: inline proximity;
       scroll-padding-inline: 1px;
-      scrollbar-color: var(--line) transparent;
-      scrollbar-width: thin;
+      scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
 
-    .rate-scroll::-webkit-scrollbar { height: 3px; }
-    .rate-scroll::-webkit-scrollbar-thumb { background: var(--line); }
+    .rate-map[data-scrollable="true"] .rate-scroll { overflow-x: auto; }
+    .rate-scroll::-webkit-scrollbar { display: none; }
+
+    .rate-scroll-indicator {
+      height: 2px;
+      margin-top: var(--space-xs);
+      overflow: hidden;
+      background: var(--line-soft);
+    }
+
+    .rate-scroll-indicator[hidden] { display: none; }
+
+    .rate-scroll-thumb {
+      display: block;
+      width: var(--thumb-width, 100%);
+      height: 100%;
+      background: var(--tone);
+      transform: translateX(var(--thumb-offset, 0));
+      transition: transform 80ms linear;
+    }
 
     .rate-band {
       min-width: 100%;
+      position: relative;
       display: flex;
       align-items: stretch;
       background: var(--paper);
@@ -744,6 +762,41 @@
       min-height: 24px;
       align-items: center;
       padding-block: 5px 3px;
+    }
+
+    .rate-period[data-single-discount="true"] .period-head {
+      min-height: 44px;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "axis terms";
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-sm);
+    }
+
+    .rate-period[data-single-discount="true"] .period-terms {
+      justify-self: stretch;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: var(--space-sm);
+    }
+
+    .period-origin-rate {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .period-origin-rate s {
+      text-decoration-color: var(--red);
+      text-decoration-thickness: 1.5px;
+    }
+
+    .period-origin-rate i {
+      color: var(--period);
+      font-style: normal;
+      font-weight: var(--weight-bold);
     }
 
     .period-axis {
@@ -1588,6 +1641,7 @@
       .result-card[data-period-count="2"] .rate-period { flex-basis: max(9rem, calc(var(--span) * 28px)); min-width: max(9rem, calc(var(--span) * 28px)); }
       .period-head { min-height: var(--period-mobile-head); grid-template-rows: minmax(24px, auto) minmax(16px, auto); gap: var(--space-xs) var(--space-sm); padding: var(--space-xs) var(--space-sm); }
       .rate-period[data-single="true"] .period-head { min-height: var(--period-mobile-night); grid-template-rows: auto; padding-block: var(--space-xs) var(--space-2xs); }
+      .rate-period[data-single="true"][data-single-discount="true"] .period-head { min-height: 44px; grid-template-rows: auto; padding: var(--space-sm); }
       .period-axis { width: 100%; min-height: 12px; gap: var(--space-xs); font-size: var(--text-2xs); }
       .period-night-count { margin-inline-start: auto; gap: var(--space-xs); }
       .period-terms { min-width: 0; flex-wrap: nowrap; gap: var(--space-xs); font-size: var(--text-2xs); }
@@ -1661,7 +1715,7 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">Operational preview · V7.4</span>BRIX Quote Card</h1>
+      <h1><span class="eyebrow">Operational preview · V7.5</span>BRIX Quote Card</h1>
     </div>
   </header>
 
@@ -2006,6 +2060,7 @@
       const pricedPeriods = data.periods.filter(period => period.price != null);
       const multiRate = pricedPeriods.length > 1;
       const multiSegment = data.periods.length > 1;
+      const singleDiscount = data.periods.length === 1 && Boolean(pricedPeriods[0]?.discount);
       const discountRules = [...new Set(pricedPeriods.filter(period => period.discount && period.rule).map(period => period.rule))];
       const visibleRules = discountRules.slice(0, 2);
       const hiddenRuleCount = Math.max(0, discountRules.length - visibleRules.length);
@@ -2030,7 +2085,9 @@
           : period.discount
             ? multiRate
               ? `<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span><span class="period-pp">€${period.pp}/pp</span>`
-              : ""
+              : singleDiscount
+                ? `${period.old ? `<span class="period-origin-rate"><s>€${period.old}</s><i aria-hidden="true">→</i></span>` : ""}<span class="period-discount"><strong>−${period.discount}%</strong>${discountName}</span>`
+                : ""
             : multiRate ? `<span class="period-pp">€${period.pp}/pp</span>` : "";
         const oldRate = period.discount && period.old
           ? `<span class="period-rate-old"><s>€${period.old}</s></span>`
@@ -2044,12 +2101,12 @@
           return markup;
         }).join("");
         const periodLabel = `${period.dates}, ${period.days.length} nights, ${period.price == null ? "not priced" : `€${period.price} per night`}`;
-        return `<article class="rate-period" aria-label="${periodLabel}" data-period="${Math.min(periodIndex + 1,4)}" data-single="${!multiSegment}" data-discount="${Boolean(period.discount)}" data-missing="${Boolean(period.missing)}" style="--span:${period.days.length};--i:${periodIndex}"><div class="period-head">${periodAxis}${rate}${terms ? `<div class="period-terms">${terms}</div>` : ""}</div><div class="night-line" style="--span:${period.days.length}">${nights}</div></article>`;
+        return `<article class="rate-period" aria-label="${periodLabel}" data-period="${Math.min(periodIndex + 1,4)}" data-single="${!multiSegment}" data-single-discount="${singleDiscount}" data-discount="${Boolean(period.discount)}" data-missing="${Boolean(period.missing)}" style="--span:${period.days.length};--i:${periodIndex}"><div class="period-head">${periodAxis}${rate}${terms ? `<div class="period-terms">${terms}</div>` : ""}</div><div class="night-line" style="--span:${period.days.length}">${nights}</div></article>`;
       }).join("");
       const rateMarker = multiRate
         ? `<span class="rate-unit-mark" aria-label="Rates shown per night">${icons.rates}<span>€/N</span></span>`
         : icons.rates;
-      return `<section class="rate-map" aria-label="Nightly price schedule">${rateMarker}<div class="rate-scroll"><div class="rate-band">${periods}</div></div></section>`;
+      return `<section class="rate-map" aria-label="Nightly price schedule" data-scrollable="false">${rateMarker}<div class="rate-scroll"><div class="rate-band">${periods}</div></div><div class="rate-scroll-indicator" aria-hidden="true" hidden><span class="rate-scroll-thumb"></span></div></section>`;
     }
 
     function groupSignals(signals) {
@@ -2094,10 +2151,11 @@
       const dock = data.dock;
       const pricedPeriods = data.periods.filter(period => period.price != null);
       const multiRate = pricedPeriods.length > 1;
+      const singleDiscount = data.periods.length === 1 && Boolean(pricedPeriods[0]?.discount);
       const rateCount = new Set(pricedPeriods.map(period => period.price)).size;
       const margin = data.privateMargin ? `<button class="management-toggle" type="button" aria-expanded="false">Margin</button><div class="management-panel" data-open="false" aria-hidden="true"><div class="management-clip"><div class="margin-row"><div><span>Cost</span><b>${data.privateMargin.cost}</b></div><div><span>Sell</span><b>${data.privateMargin.sell}</b></div><div><span>Profit</span><b>${data.privateMargin.profit}</b></div></div></div></div>` : "";
-      const oldPrice = dock.old ? `<span class="dock-old-inline"><span>was</span><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
-      const discount = dock.discount ? `<span class="dock-discount" aria-label="${dock.discount.value} discount, rule ${dock.discount.rule}"><strong>${dock.discount.value}</strong><small>${dock.discount.rule}</small></span>` : "";
+      const oldPrice = !singleDiscount && dock.old ? `<span class="dock-old-inline"><span>was</span><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
+      const discount = !singleDiscount && dock.discount ? `<span class="dock-discount" aria-label="${dock.discount.value} discount, rule ${dock.discount.rule}"><strong>${dock.discount.value}</strong><small>${dock.discount.rule}</small></span>` : "";
       const pricing = multiRate
         ? `<span class="dock-segments" aria-label="${rateCount} nightly rates">${icons.rates}<strong>${rateCount}</strong><span>rates</span></span>`
         : `<div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div>${dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}`;
@@ -2118,6 +2176,62 @@
     const scenarioList = document.querySelector("#scenarioList");
     const scenarioCount = document.querySelector("#scenarioCount");
     const caseTotal = document.querySelector("#caseTotal");
+    let releaseRateScroll = () => {};
+
+    function bindRateScroll() {
+      releaseRateScroll();
+      const rateMap = preview.querySelector(".rate-map");
+      const rateScroll = rateMap?.querySelector(".rate-scroll");
+      const rateBand = rateMap?.querySelector(".rate-band");
+      const indicator = rateMap?.querySelector(".rate-scroll-indicator");
+      const thumb = rateMap?.querySelector(".rate-scroll-thumb");
+      if (!rateMap || !rateScroll || !rateBand || !indicator || !thumb) return;
+
+      let animationFrame = 0;
+      const update = () => {
+        animationFrame = 0;
+        const periods = [...rateBand.querySelectorAll(".rate-period")];
+        const contentWidth = Math.max(rateBand.clientWidth, ...periods.map(period => period.offsetLeft + period.offsetWidth));
+        const layoutOverflow = contentWidth - rateScroll.clientWidth;
+        const scrollable = layoutOverflow > 8;
+        rateMap.dataset.scrollable = String(scrollable);
+        indicator.hidden = !scrollable;
+
+        if (!scrollable) {
+          rateScroll.scrollLeft = 0;
+          rateScroll.removeAttribute("tabindex");
+          rateScroll.removeAttribute("aria-label");
+          thumb.style.setProperty("--thumb-width", "100%");
+          thumb.style.setProperty("--thumb-offset", "0px");
+          return;
+        }
+
+        rateScroll.tabIndex = 0;
+        rateScroll.setAttribute("aria-label", "Scroll nightly rate periods");
+        const trackWidth = indicator.clientWidth;
+        const thumbWidth = Math.max(32, trackWidth * (rateScroll.clientWidth / rateScroll.scrollWidth));
+        const scrollRange = rateScroll.scrollWidth - rateScroll.clientWidth;
+        const progress = scrollRange ? rateScroll.scrollLeft / scrollRange : 0;
+        thumb.style.setProperty("--thumb-width", `${thumbWidth}px`);
+        thumb.style.setProperty("--thumb-offset", `${Math.max(0, trackWidth - thumbWidth) * progress}px`);
+      };
+      const scheduleUpdate = () => {
+        if (animationFrame) return;
+        animationFrame = window.requestAnimationFrame(update);
+      };
+
+      rateScroll.addEventListener("scroll", scheduleUpdate, { passive: true });
+      window.addEventListener("resize", scheduleUpdate, { passive: true });
+      const observer = typeof ResizeObserver === "function" ? new ResizeObserver(scheduleUpdate) : null;
+      observer?.observe(rateScroll);
+      releaseRateScroll = () => {
+        if (animationFrame) window.cancelAnimationFrame(animationFrame);
+        rateScroll.removeEventListener("scroll", scheduleUpdate);
+        window.removeEventListener("resize", scheduleUpdate);
+        observer?.disconnect();
+      };
+      scheduleUpdate();
+    }
 
     function bindCard() {
       const review = preview.querySelector(".review-button");
@@ -2162,6 +2276,7 @@
           copyLabel.textContent = original;
         }, 1400);
       });
+      bindRateScroll();
     }
 
     function selectScenario(index, focus = false) {
