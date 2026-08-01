@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BRIX — Quote Card V6.7</title>
+  <title>BRIX — Quote Card V6.8</title>
   <style>
     :root {
       --paper: oklch(98.4% 0.007 84);
@@ -297,6 +297,17 @@
     }
 
     .identity { min-width: 0; }
+
+    .identity-heading[data-quiet="true"] {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-sm);
+    }
+
+    .identity-heading[data-quiet="true"] .status-line { margin: 0; }
+    .identity[data-quiet="true"] .tag-row { margin-left: 28px; }
+    .title-copy { min-width: 0; }
 
     .status-line {
       display: flex;
@@ -1346,6 +1357,8 @@
       }
 
       .result-head { min-height: 0; gap: 6px; padding: var(--space-sm) 10px 6px; }
+      .identity-heading[data-quiet="true"] { grid-template-columns: 18px minmax(0, 1fr); gap: 6px; }
+      .identity[data-quiet="true"] .tag-row { margin-left: 24px; }
       .status-line { gap: 6px; margin-bottom: var(--space-2xs); }
       .state-beacon { width: 18px; height: 18px; }
       .status-word { font-size: var(--text-xs); }
@@ -1420,7 +1433,8 @@
     }
 
     @media (pointer: coarse) {
-      .scenario, .review-button, .management-toggle, .copy-button, .tool-button { min-height: 44px; }
+      .scenario, .review-button, .management-toggle, .copy-button, .tool-button { min-height: 45px; }
+      .review-button { min-width: 45px; justify-content: center; }
     }
 
     @media (prefers-contrast: more) {
@@ -1440,7 +1454,7 @@
 <body>
   <header class="lab-head">
     <div class="lab-head__inner">
-      <h1><span class="eyebrow">Operational preview · V6.7</span>BRIX Quote Card</h1>
+      <h1><span class="eyebrow">Operational preview · V6.8</span>BRIX Quote Card</h1>
     </div>
   </header>
 
@@ -1471,13 +1485,14 @@
       hotel: "",
       room: "DELUXE ROOM SEA VIEW",
       tags: [{ text: "Best price", short: "Best", kind: "best" }, { text: "Ultra all inclusive", short: "UAI", kind: "board" }],
-      occupancyLabel: "Priced for",
+      occupancyLabel: "",
       party: "2 Adults",
+      partyShort: "2A",
       factor: "×2.5",
       pricedParty: "",
       periods: [{ id: "P1", dates: "03–10 Aug", days: ["03","04","05","06","07","08","09"], price: 210, pp: 105 }],
       signals: [],
-      dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" },
+      dock: { label: "", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" },
       cta: "Copy quote",
       privateMargin: null
     };
@@ -1487,12 +1502,13 @@
       { name: "Discount", data: {
         ...base,
         periods: [{ id: "P1", dates: "03–10 Aug", days: ["03","04","05","06","07","08","09"], price: 210, pp: 105, old: 242, discount: 13, rule: "SPO09" }],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp", old: "€242", discount: { value: "✓ −13%", rule: "SPO09" } }
+        dock: { label: "", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp", old: "€242", discount: { value: "✓ −13%", rule: "SPO09" } }
       }},
       { name: "2 periods", data: {
         ...base,
         room: "FAMILY ROOM LAND VIEW",
         party: "2 Adults + 1 Child",
+        partyShort: "2A · 1C",
         factor: "×2.8",
         periods: [
           { id: "P1", dates: "28–31 Aug", days: ["28","29","30"], price: 210, pp: 105, old: 242, discount: 13, rule: "SPO09" },
@@ -1517,6 +1533,7 @@
         state: "Action",
         room: "FAMILY SUITE GARDEN VIEW",
         party: "2 Adults + 2 Children",
+        partyShort: "2A · 2C",
         factor: "×3.6",
         signals: [
           { kind: "action", title: "Confirm by 18:00 tomorrow", text: "" },
@@ -1527,7 +1544,7 @@
           { kind: "action", title: "Child 1 age", text: "12.4 > 11.99." },
           { kind: "applied", title: "Senior discount", text: "Included." }
         ],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
+        dock: { label: "", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
       }},
       { name: "Occupancy", data: {
         ...base,
@@ -1535,10 +1552,11 @@
         stateMark: "≈",
         state: "Reference",
         room: "FAMILY SUITE GARDEN VIEW",
-        occupancyLabel: "Searched",
+        occupancyLabel: "Search",
         party: "2 Adults + 2 Children",
+        partyShort: "2A · 2C",
         factor: "×3.1",
-        pricedParty: "Matched: 2 Adults + 1 Child",
+        pricedParty: "Match · 2A · 1C",
         signals: [
           { kind: "action", title: "Choose exact occupancy", text: "Nearest match only." },
           { kind: "info", title: "Alternatives", text: "2A + 1C · 3A · 2A + 2C in two rooms." }
@@ -1553,13 +1571,14 @@
         state: "Ready",
         room: "FAMILY ROOM SEA VIEW",
         party: "2 Adults + 2 Children + 1 Infant",
+        partyShort: "2A · 2C · 1I",
         factor: "×4.0",
         signals: [
           { kind: "info", title: "Infant free", text: "No rate change." },
           { kind: "info", title: "Promoted occupancy", text: "Contract conversion applied." },
           { kind: "info", title: "Long-stay floor", text: "Short-stay rate protects quote." }
         ],
-        dock: { label: "Final rate", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
+        dock: { label: "", coverage: "7 nights", value: "€210", unit: "/night", range: "€105/pp" }
       }},
       { name: "Adjusted", data: {
         ...base,
@@ -1587,6 +1606,7 @@
         state: "Blocked",
         room: "GRAND FAMILY SUITE — PRIVATE POOL & SEA VIEW WITH CONNECTING ROOM",
         party: "4 Adults + 3 Children + 1 Infant",
+        partyShort: "4A · 3C · 1I",
         factor: "×5.5",
         periods: [
           { id: "P1", dates: "03–05 Aug", days: ["03","04"], price: 231, pp: 115.5, old: 260, discount: 11.5, rule: "SPO09" },
@@ -1701,13 +1721,15 @@
       const margin = data.privateMargin ? `<button class="management-toggle" type="button" aria-expanded="false">Margin</button><div class="management-panel" data-open="false" aria-hidden="true"><div class="management-clip"><div class="margin-row"><div><span>Cost</span><b>${data.privateMargin.cost}</b></div><div><span>Sell</span><b>${data.privateMargin.sell}</b></div><div><span>Profit</span><b>${data.privateMargin.profit}</b></div></div></div></div>` : "";
       const oldPrice = dock.old ? `<span class="dock-old-inline"><span>was</span><s>${dock.old}</s><i aria-hidden="true">→</i></span>` : "";
       const discount = dock.discount ? `<span class="dock-discount" aria-label="${dock.discount.value} discount, rule ${dock.discount.rule}"><strong>${dock.discount.value}</strong><small>${dock.discount.rule}</small></span>` : "";
-      return `<aside class="quote-dock"><div class="dock-summary"><div class="dock-meta"><span class="dock-label">${dock.label}</span><span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span></div><div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div>${dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
+      return `<aside class="quote-dock"><div class="dock-summary"><div class="dock-meta">${dock.label ? `<span class="dock-label">${dock.label}</span>` : ""}<span class="dock-coverage">${icons.night}<span>${dock.coverage}</span></span></div><div class="dock-value"><div class="dock-price-stack">${oldPrice}<span class="dock-current"><strong>${dock.value}</strong>${dock.unit ? `<span>${dock.unit}</span>` : ""}</span></div>${discount}</div>${dock.range ? `<p class="dock-range">${dock.range}</p>` : ""}${dock.base ? `<p class="dock-base">${dock.base}</p>` : ""}${margin}</div><div class="dock-actions"><button class="copy-button" type="button" data-copy="${encodeURIComponent(buildCopyText(data))}">${icons.copy}<span>${data.cta}</span></button><div class="tool-row"><button class="tool-button" type="button">${icons.calc}<span>Calc</span></button><button class="tool-button" type="button">${icons.file}<span>Contract</span></button><button class="tool-button" type="button">${icons.file}<span>SPO</span></button></div></div></aside>`;
     }
 
     function renderCard(data) {
       const signals = renderSignals(data);
       const occupancyCount = Math.max(1, Math.min(partySize(data.party), 8));
-      return `<article class="result-card" data-tone="${data.tone}" data-period-count="${data.periods.length}" data-has-discount="${data.periods.some(period => period.discount)}"><div class="card-main"><header class="result-head"><div class="identity"><div class="status-line"><span class="state-beacon" aria-hidden="true">${data.stateMark}</span><span class="status-word">${data.state}</span></div>${data.hotel ? `<span class="hotel-name">${data.hotel}</span>` : ""}<h2 class="room-name">${data.room}</h2><div class="tag-row">${data.tags.map(tagMarkup).join("")}</div></div><div class="occupancy">${icons.occupancy(occupancyCount)}<div class="occupancy-copy"><span class="occupancy-label">${data.occupancyLabel}</span><span class="party">${data.party}<i class="factor">${icons.factor}<span>${data.factor}</span></i></span>${data.pricedParty ? `<span class="priced-party">${data.pricedParty}</span>` : ""}</div></div></header>${renderRateMap(data)}${signals.summary}</div>${renderDock(data)}${signals.drawer}</article>`;
+      const quietState = data.state === "Ready";
+      const partyDisplay = data.partyShort || data.party;
+      return `<article class="result-card" data-tone="${data.tone}" data-period-count="${data.periods.length}" data-has-discount="${data.periods.some(period => period.discount)}"><div class="card-main"><header class="result-head"><div class="identity" data-quiet="${quietState}"><div class="identity-heading" data-quiet="${quietState}"><div class="status-line" aria-label="${data.state}"><span class="state-beacon" aria-hidden="true">${data.stateMark}</span>${quietState ? "" : `<span class="status-word">${data.state}</span>`}</div><div class="title-copy">${data.hotel ? `<span class="hotel-name">${data.hotel}</span>` : ""}<h2 class="room-name">${data.room}</h2></div></div><div class="tag-row">${data.tags.map(tagMarkup).join("")}</div></div><div class="occupancy">${icons.occupancy(occupancyCount)}<div class="occupancy-copy">${data.occupancyLabel ? `<span class="occupancy-label">${data.occupancyLabel}</span>` : ""}<span class="party" aria-label="${data.party}">${partyDisplay}<i class="factor">${icons.factor}<span>${data.factor}</span></i></span>${data.pricedParty ? `<span class="priced-party">${data.pricedParty}</span>` : ""}</div></div></header>${renderRateMap(data)}${signals.summary}</div>${renderDock(data)}${signals.drawer}</article>`;
     }
 
     const preview = document.querySelector("#preview");
